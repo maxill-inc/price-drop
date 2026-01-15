@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plinko Game</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      font-family: 'Arial', sans-serif;
+    }
+    
+    h1 {
+      color: #ffd93d;
+      font-size: 2.5em;
+      margin: 0 0 10px 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .info {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 20px;
+      font-size: 1.3em;
+    }
+    
+    .stat {
+      color: white;
+      font-weight: bold;
+    }
+    
+    .score {
+      color: #4ecca3;
+    }
+    
+    .balls {
+      color: #45b7d1;
+    }
+    
+    #gameCanvas {
+      border: 4px solid #e94560;
+      border-radius: 10px;
+      cursor: crosshair;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    
+    .instructions {
+      color: #ddd;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 1.1em;
+    }
+    
+    .multipliers {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      align-items: center;
+    }
+    
+    .mult {
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .mult-5 { background: #4ecca3; }
+    .mult-3 { background: #45b7d1; }
+    .mult-2 { background: #3498db; }
+    .mult-1 { background: #f39c12; }
+    .mult-05 { background: #95a5a6; }
+  </style>
+</head>
+<body>
+  <h1>🎯 Plinko Game</h1>
+  <div class="info">
+    <div class="stat score">Score: <span id="score">0.0</span></div>
+    <div class="stat balls">Active Balls: <span id="balls">0</span></div>
+  </div>
+  <canvas id="gameCanvas"></canvas>
+  <div class="instructions">
+    <p>Click anywhere on the board to drop a ball!</p>
+    <div class="multipliers">
+      <span class="mult mult-5">5x</span>
+      <span class="mult mult-3">3x</span>
+      <span class="mult mult-2">2x</span>
+      <span class="mult mult-1">1x</span>
+      <span class="mult mult-05">0.5x</span>
+    </div>
+  </div>
+
+  <script>
+    const { Engine, Render, Bodies, World, Events, Runner } = Matter;
+    
+    const w = 800;
+    const h = 600;
+    let score = 0;
+    let activeBalls = 0;
+    
+    const engine = Engine.create();
+    const canvas = document.getElementById('gameCanvas');
+    
+    const render = Render.create({
+      canvas: canvas,
+      engine: engine,
+      options: {
+        width: w,
+        height: h,
+        wireframes: false,
+        background: '#0f3460'
+      }
+    });
+
+    // Create walls
+    const wallThickness = 20;
+    const walls = [
+      Bodies.rectangle(w / 2, h + wallThickness / 2, w, wallThickness, { 
+        isStatic: true,
+        render: { fillStyle: '#1a1a2e' }
+      }),
+      Bodies.rectangle(-wallThickness / 2, h / 2, wallThickness, h, { 
+        isStatic: true,
+        render: { fillStyle: '#1a1a2e' }
+      }),
+      Bodies.rectangle(w + wallThickness / 2, h / 2, wallThickness, h, { 
+        isStatic: true,
+        render: { fillStyle: '#1a1a2e' }
+      })
+    ];
+
+    // Create pegs in triangular pattern
+    const pegs = [];
+    const pegRadius = 5;
+    const rows = 12;
+    const spacing = 60;
+    const startY = 100;
+
+    for (let row = 0; row < rows; row++) {
+      const numPegs = row + 3;
+      const rowWidth = (numPegs - 1) * spacing;
+      const startX = (w - rowWidth) / 2;
+      
+      for (let col = 0; col < numPegs; col++) {
+        const x = startX + col * spacing;
+        const y = startY + row * spacing;
+        
+        const peg = Bodies.circle(x, y, pegRadius, {
+          isStatic: true,
+          render: { fillStyle: '#e94560' },
+          restitution: 0.8
+        });
+        pegs.push(peg);
+      }
+    }
+
+    // Create scoring buckets at bottom
+    const buckets = [];
+    const bucketWidth = 55;
+    const bucketHeight = 80;
+    const numBuckets = 9;
+    const bucketY = h - bucketHeight / 2 - 20;
+    const bucketSpacing = (w - 100) / numBuckets;
+    const multipliers = [5, 3, 2, 1, 0.5, 1, 2, 3, 5];
+
+    for (let i = 0; i < numBuckets; i++) {
+      const x = 50 + bucketSpacing / 2 + i * bucketSpacing;
+      const mult = multipliers[i];
+      const color = mult >= 3 ? '#4ecca3' : mult >= 2 ? '#45b7d1' : mult >= 1 ? '#f39c12' : '#95a5a6';
+      
+      const bucket = Bodies.rectangle(x, bucketY, bucketWidth - 10, bucketHeight, {
+        isStatic: true,
+        isSensor: true,
+        render: { 
+          fillStyle: color,
+          opacity: 0.3
+        },
+        label: `bucket-${mult}`
+      });
+      buckets.push(bucket);
+      
+      // Bucket dividers
+      if (i < numBuckets - 1) {
+        const divider = Bodies.rectangle(
+          x + bucketSpacing / 2,
+          bucketY,
+          3,
+          bucketHeight + 10,
+          {
+            isStatic: true,
+            render: { fillStyle: '#1a1a2e' }
+          }
+        );
+        buckets.push(divider);
+      }
+    }
+
+    World.add(engine.world, [...walls, ...pegs, ...buckets]);
+
+    // Handle ball collisions with buckets
+    Events.on(engine, 'collisionStart', (event) => {
+      event.pairs.forEach((pair) => {
+        const { bodyA, bodyB } = pair;
+        const bucket = bodyA.label?.startsWith('bucket-') ? bodyA : 
+                      bodyB.label?.startsWith('bucket-') ? bodyB : null;
+        const ball = bodyA.label === 'ball' ? bodyA : 
+                    bodyB.label === 'ball' ? bodyB : null;
+
+        if (bucket && ball && !ball.scored) {
+          ball.scored = true;
+          const mult = parseFloat(bucket.label.split('-')[1]);
+          score += mult;
+          document.getElementById('score').textContent = score.toFixed(1);
+          
+          setTimeout(() => {
+            World.remove(engine.world, ball);
+            activeBalls--;
+            document.getElementById('balls').textContent = activeBalls;
+          }, 100);
+        }
+      });
+    });
+
+    // Drop ball on click
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      
+      const ball = Bodies.circle(x, 20, 8, {
+        restitution: 0.5,
+        friction: 0.1,
+        render: { fillStyle: '#ffd93d' },
+        label: 'ball',
+        scored: false
+      });
+
+      World.add(engine.world, ball);
+      activeBalls++;
+      document.getElementById('balls').textContent = activeBalls;
+    });
+
+    const runner = Runner.create();
+    Runner.run(runner, engine);
+    Render.run(render);
+  </script>
+</body>
+</html>
