@@ -150,6 +150,29 @@ const priceDrop = {
             }
         );
         return disc;
+    },
+    buildSlotDividers: function() {
+        const dividers = [];
+        const totalWidth = (this.width-((this.width*0.09)*2));
+        const height = 40;
+        const dividerGap = totalWidth/this.slots+(this.walls.thickness*(this.slots-1));
+        console.log(dividerGap);
+        let x = (this.width*0.09)+dividerGap-(this.walls.thickness/2);
+        let y = this.height-(height/2)-this.walls.thickness;
+        for (let i=0; i < this.slots-1; i++) {
+            const divider = Matter.Bodies.rectangle(
+                x,
+                y,
+                this.walls.thickness,
+                height, {
+                    render: { fillStyle: 'red' },
+                    isStatic: true
+                }
+            )
+            x = x + dividerGap;
+            dividers.push(divider);
+        }
+        return dividers;
     }
 
 }
@@ -157,7 +180,9 @@ const priceDrop = {
 
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildWalls());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildPegs());
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSlotDividers());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+
 
     const runner = Matter.Runner.create();
     Matter.Runner.run(runner, priceDrop.engine);
