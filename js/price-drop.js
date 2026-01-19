@@ -112,6 +112,7 @@ const priceDrop = {
         const blockHeight = this.height-((this.height*0.17)*5);
         const pegs = [];
         const rows = 10;
+        const pegRadius = (((this.width-((this.width*0.09)*2))/this.slots)/30)
         let pegGapX = (this.width-(this.width*0.18))/this.slots;
         let pegGapY = (this.height*0.17)/2;
         let x = pegGapX;
@@ -126,7 +127,7 @@ const priceDrop = {
                 pegs.push(Matter.Bodies.circle(
                     x,
                     y,
-                    3/* {{this should maybe be dynamic based on slot/disc size}} */, {
+                    pegRadius, {
                     render: {fillStyle: '#fff'},
                     isStatic: true,
                 }));
@@ -156,8 +157,8 @@ const priceDrop = {
 
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildWalls());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildPegs());
-
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+
     const runner = Matter.Runner.create();
     Matter.Runner.run(runner, priceDrop.engine);
     Matter.Render.run(priceDrop.buildCanvas());
