@@ -52,53 +52,55 @@ const priceDrop = {
             })
         ];
  
+        let triangleRadius = this.width*0.06;
         // Draw triangles down left side
-        let leftX = this.width*0.06/2;
+        let leftX = triangleRadius/2;
         let leftY = this.height*0.17/2 + this.height*0.09;
         for (let i=0; i < 5; i++){
             const triangle = Matter.Bodies.polygon(
-                this.width*0.06-this.walls.thickness, leftY, 3, this.width*0.06, {
+                leftX, leftY, 3, triangleRadius, {
                     render: { fillStyle: this.walls.colour },
                     isStatic: true
                 }
             );
             // Stretch and rotate triangle
             Matter.Body.rotate(triangle, Math.PI / 1);
-            Matter.Body.scale(triangle, 1, (this.height*0.17)/(this.width*0.06));
+            Matter.Body.scale(triangle, 1, (this.height/5)/triangleRadius);
             walls.push(triangle);
             leftY = leftY + this.height*0.17;
         }
 
         // Draw triangles down right side
-        let rightX = this.width - this.width*0.06/2;
+        let rightX = this.width - triangleRadius/2;
         let rightY = this.height*0.17/2 + this.height*0.09;
         for (let i=0; i < 5; i++){
             const triangle = Matter.Bodies.polygon(
-                rightX, rightY, 3, this.width*0.06, {
+                rightX, rightY, 3, triangleRadius, {
                     render: { fillStyle: this.walls.colour },
                     isStatic: true
                 }
             );
             // Stretch triangle
-            Matter.Body.scale(triangle, 1, (this.height*0.17)/(this.width*0.06));
+            Matter.Body.scale(triangle, 1, (this.height/5)/triangleRadius);
             walls.push(triangle);
             rightY = rightY + this.height*0.17;
         }
 
         // Draw bottom wall blocks
+        const bottomBlockHeight = this.height-((this.height*0.17)*5);
         const leftBlock = Matter.Bodies.rectangle(
-            this.width*0.12/2-this.walls.thickness, 
+            this.width*0.09/2, 
             this.height-(this.height*0.17/2)+this.walls.thickness, 
-            this.width*0.12, 
-            this.height-((this.height*0.17)*5), { 
+            this.width*0.09, 
+            bottomBlockHeight, { 
                 render: { fillStyle: this.walls.colour }, 
                 isStatic: true
         });
         const rightBlock = Matter.Bodies.rectangle(
-            this.width-this.width*0.06/2, 
+            this.width-this.width*0.09/2, 
             this.height-(this.height*0.17/2)+this.walls.thickness, 
-            this.width*0.12, 
-            this.height-((this.height*0.17)*5), { 
+            this.width*0.09, 
+            bottomBlockHeight, { 
                 render: { fillStyle: this.walls.colour }, 
                 isStatic: true
         });
@@ -107,26 +109,31 @@ const priceDrop = {
         return walls;
     },
     buildPegs: function() {
+        const blockHeight = this.height-((this.height*0.17)*5);
         const pegs = [];
-        let x = 0;
-        let y = 35;
         const rows = 10;
+        let pegGapX = (this.width-(this.width*0.18))/this.slots;
+        let pegGapY = (this.height*0.17)/2;
+        let x = pegGapX;
+        let y = this.height-(pegGapY*rows)-blockHeight/2.75;
+        
         for (let row=0; row < rows; row++){
-            y = y + 50;
+            
             // set number of pegs per row
             let cols = 0;
             (row%2 === 0) ? cols = this.slots : cols = this.slots-1;
             for (let col=0; col < cols; col++) {
-                x = x + 50
                 pegs.push(Matter.Bodies.circle(
                     x,
                     y,
-                    3, {
+                    3/* {{this should maybe be dynamic based on slot/disc size}} */, {
                     render: {fillStyle: '#fff'},
                     isStatic: true,
                 }));
+                x = x + pegGapX;
             }
-            (row%2 === 0) ? x = 20 : x = 10;
+            y = y + pegGapY;
+            (row%2 === 0) ? x = pegGapX+(pegGapX/2) : x = pegGapX;
         }
         return pegs;
     }
