@@ -137,10 +137,10 @@ const priceDrop = {
         }
         return pegs;
     },
-    buildDisc: function() {
+    buildDisc: function(x) {
         const radius = (((this.width-((this.width*0.09)*2))/this.slots)/4);
         const disc = Matter.Bodies.circle(
-            60,
+            x,
             0,
             radius,{
                 render: { fillStyle: 'orange' },
@@ -157,7 +157,7 @@ const priceDrop = {
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildWalls());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildPegs());
 
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc());
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
     const runner = Matter.Runner.create();
     Matter.Runner.run(runner, priceDrop.engine);
     Matter.Render.run(priceDrop.buildCanvas());
