@@ -7,7 +7,7 @@
 
 const priceDrop = {
     width: 400,
-    height: 600,
+    height: 500,
     slots: 5,
     walls: {thickness: 10, colour: '#1c75bc'},
     background: '#00205c',
@@ -136,14 +136,28 @@ const priceDrop = {
             (row%2 === 0) ? x = pegGapX+(pegGapX/2) : x = pegGapX;
         }
         return pegs;
+    },
+    buildDisc: function() {
+        const radius = (((this.width-((this.width*0.09)*2))/this.slots)/4);
+        const disc = Matter.Bodies.circle(
+            60,
+            0,
+            radius,{
+                render: { fillStyle: 'orange' },
+                friction: 0.1,
+                restitution: 0.7
+            }
+        );
+        return disc;
     }
+
 }
 
 
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildWalls());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildPegs());
-    
-    Matter.Composite.add(priceDrop.engine.world, Matter.Bodies.circle(30, 0, 20, {friction: 0.1, restitution: 0.7}));
+
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc());
     const runner = Matter.Runner.create();
     Matter.Runner.run(runner, priceDrop.engine);
     Matter.Render.run(priceDrop.buildCanvas());
