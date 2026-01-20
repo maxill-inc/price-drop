@@ -180,7 +180,7 @@ const priceDrop = {
             radius,{
                 render: { fillStyle: 'orange' },
                 friction: 0.1,
-                restitution: 0.5,
+                restitution: Math.random() * (0.7 - 0.5) + 0.5,
                 label: 'disc'
             }
         );
