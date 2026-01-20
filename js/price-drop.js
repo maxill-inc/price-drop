@@ -233,7 +233,7 @@ const priceDrop = {
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildPegs());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSlotDividers());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSensors());
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(99));
     
     // Sensor detection
     Matter.Events.on(priceDrop.engine, 'collisionStart', (event) => {
@@ -249,6 +249,15 @@ const priceDrop = {
 
     })
 
+    // Event handler for disc drop
+    priceDrop.canvas.addEventListener('click', (e) => {
+        let x = Number(e.clientX);
+        const canvas = priceDrop.canvas.getBoundingClientRect();
+        x = x - canvas.left;
+        if ((x > priceDrop.walls.thickness) && x < (priceDrop.width - priceDrop.walls.thickness)) {
+            Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(x));
+        }
+    }); 
 
 
 
