@@ -167,7 +167,8 @@ const priceDrop = {
             radius,{
                 render: { fillStyle: 'orange' },
                 friction: 0.1,
-                restitution: 0.7
+                restitution: 0.7,
+                label: 'disc'
             }
         );
         return disc;
@@ -215,7 +216,8 @@ const priceDrop = {
                 height, {
                     render: {fillStyle: '#c007'},
                     isStatic: true,
-                    isSensor: true
+                    isSensor: true,
+                    label: `sensor-${i}`
                 }
             )
             x = x + dividerGap;
@@ -232,15 +234,21 @@ const priceDrop = {
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSlotDividers());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSensors());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    
+    // Sensor detection
+    Matter.Events.on(priceDrop.engine, 'collisionStart', (event) => {
+        const pairs = event.pairs;
+
+        for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i];
+
+            if (pair.bodyA.label.startsWith('sensor')) {
+                console.log(`You got ${pair.bodyA.label}`);
+            }
+        }
+
+    })
+
 
 
 
