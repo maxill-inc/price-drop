@@ -154,7 +154,6 @@ const priceDrop = {
         let y = (this.triangleHeight/2)+(this.height-this.triangleHeight*this.triangles)-this.walls.thickness-this.triangleHeight;
         
         for (let row=0; row < rows; row++){
-            
             // set number of pegs per row
             let cols = 0;
             (row%2 === 0) ? cols = this.slots : cols = this.slots-1;
@@ -237,7 +236,8 @@ const priceDrop = {
                 var pair = pairs[i];
 
                 if (pair.bodyA.label.startsWith('sensor')) {
-                    console.log(`You got ${pair.bodyA.label}`);
+                    const prizeIndex = pair.bodyA.label.slice(7);
+                    console.log(`You got ${prizeList[prizeIndex].name}`);
                 }
             }
 
@@ -254,6 +254,44 @@ const priceDrop = {
         }); 
     }
 }
+
+const prizeList = [
+    {
+        name: 'Prize 1',
+        item: '#0001',
+        imgSrc: '',
+    },
+    {
+        name: 'Prize 2',
+        item: '#0002',
+        imgSrc: '',
+    },
+    {
+        name: 'Prize 3',
+        item: '#0003',
+        imgSrc: '',
+    },
+    {
+        name: 'Prize 4',
+        item: '#0004',
+        imgSrc: '',
+    },
+    {
+        name: 'Prize 5',
+        item: '#0005',
+        imgSrc: '',
+    },
+    {
+        name: 'Prize 6',
+        item: '#0006',
+        imgSrc: '',
+    },
+    {
+        name: 'Prize 7',
+        item: '#0007',
+        imgSrc: '',
+    },
+]
 
 
 // Initialize game
