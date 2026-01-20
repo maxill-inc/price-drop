@@ -125,15 +125,19 @@ const priceDrop = {
         return walls;
     },
     buildPegs: function() {
-        const blockHeight = this.height-((this.height*0.17)*5);
-        const totalWidth = (this.width-((this.width*0.09)*2));
+        const triangleHeight = this.height*0.16;
+        const padding = this.width*this.padding;
+        const totalWidth = this.width-(padding*2)-(this.walls.thickness*2);
+        const slotWidth = (totalWidth-((this.slots-1)*this.walls.thickness))/this.slots;
+        const dividerGap = slotWidth + this.walls.thickness;
+
         const pegs = [];
         const rows = 10;
         const pegRadius = (((this.width-((this.width*0.09)*2))/this.slots)/30)
-        let pegGapX = totalWidth/this.slots;
-        let pegGapY = (this.height*0.17)/2;
-        let x = totalWidth-(pegGapX*(this.slots))+(this.width*0.09)+(pegGapX/2);
-        let y = this.height-(pegGapY*rows)-blockHeight/2.75;
+        let pegGapX = slotWidth + this.walls.thickness;
+        let pegGapY = triangleHeight/2;
+        let x = this.walls.thickness + padding + slotWidth/2;
+        let y = (triangleHeight/2)+(this.height-triangleHeight*this.triangles)-this.walls.thickness-triangleHeight;
         
         for (let row=0; row < rows; row++){
             
@@ -151,7 +155,7 @@ const priceDrop = {
                 x = x + pegGapX;
             }
             y = y + pegGapY;
-            (row%2 === 0) ? x = pegGapX+(pegGapX/2) : x = pegGapX;
+            (row%2 === 0) ? x = (this.walls.thickness + padding + slotWidth/2) + pegGapX/2 : x = this.walls.thickness + padding + slotWidth/2;
         }
         return pegs;
     },
