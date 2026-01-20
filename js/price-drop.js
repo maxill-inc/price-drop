@@ -5,9 +5,9 @@
  */
 
 const priceDrop = {
-    width: 400,
-    height: 600,
-    slots: 5,
+    width: 500,
+    height: 700,
+    slots: 7,
     walls: {thickness: 10, colour: '#1c75bc'},
     padding: 0.06,
     triangles: 5,
@@ -176,7 +176,8 @@ const priceDrop = {
         const dividers = [];
         const padding = this.width*this.padding;
         const totalWidth = this.width-(padding*2)-(this.walls.thickness*2);
-        const height = 40;
+        const triangleHeight = this.height*0.16;
+        const height = triangleHeight/2;
         const slotWidth = (totalWidth-((this.slots-1)*this.walls.thickness))/this.slots;
         const dividerGap = slotWidth + this.walls.thickness;
         let x = this.walls.thickness + padding + slotWidth + (this.walls.thickness/2);
@@ -195,6 +196,32 @@ const priceDrop = {
             dividers.push(divider);
         }
         return dividers;
+    },
+    buildSensors: function() {
+        const sensors = [];
+        const padding = this.width*this.padding;
+        const totalWidth = this.width-(padding*2)-(this.walls.thickness*2);
+        const triangleHeight = this.height*0.16;
+        const height = triangleHeight/3;
+        const slotWidth = (totalWidth-((this.slots-1)*this.walls.thickness))/this.slots;
+        const dividerGap = slotWidth + this.walls.thickness;
+        let x = this.walls.thickness + padding + slotWidth/2;
+        let y = this.height-(height/2)-this.walls.thickness;
+        for (let i=0; i < this.slots; i++) {
+            const sensor = Matter.Bodies.rectangle(
+                x,
+                y,
+                slotWidth,
+                height, {
+                    render: {fillStyle: '#c007'},
+                    isStatic: true,
+                    isSensor: true
+                }
+            )
+            x = x + dividerGap;
+            sensors.push(sensor);
+        }
+        return sensors;
     }
 
 }
@@ -203,6 +230,16 @@ const priceDrop = {
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildWalls());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildPegs());
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSlotDividers());
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSensors());
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
+    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
     Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(88));
 
 
