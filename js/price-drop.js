@@ -6,14 +6,30 @@
 
 const priceDrop = {
     width: 500,
-    height: 700,
-    slots: 7,
+    height: 500,
+    slots: 5,
     walls: {thickness: 10, colour: '#1c75bc'},
-    padding: 0.06,
     triangles: 5,
     background: '#00205c',
     engine: Matter.Engine.create(),
     canvas: document.getElementById('price-drop'),
+    create: function(w, h, slots) {
+        // Set input parameters for canvas
+        this.width = Number(w);
+        this.height = Number(h);
+        this.slots = Number(slots);
+        this.padding = this.width*0.06;
+        this.triangleHeight = this.height*0.16;
+        this.totalWidth = this.width-(this.padding*2)-(this.walls.thickness*2);
+        this.slotWidth = (this.totalWidth-((this.slots-1)*this.walls.thickness))/this.slots;
+        this.dividerGap = this.slotWidth + this.walls.thickness;
+
+        // Initialize Matter.js
+        Matter.Composite.add(this.engine.world, this.buildWalls());
+        Matter.Composite.add(this.engine.world, this.buildPegs());
+        Matter.Composite.add(this.engine.world, this.buildSlotDividers());
+        Matter.Composite.add(this.engine.world, this.buildSensors());
+    },
     buildCanvas: function (){
         return Matter.Render.create({
         canvas: this.canvas,
@@ -58,18 +74,16 @@ const priceDrop = {
         );
         
         // Create triangles along left wall
-        const padding = this.width*this.padding;
-        const triangleHeight = this.height*0.16;
-        let y = (triangleHeight/2)+(this.height-triangleHeight*this.triangles)-this.walls.thickness-triangleHeight/2;
+        let y = (this.triangleHeight/2)+(this.height-this.triangleHeight*this.triangles)-this.walls.thickness-this.triangleHeight/2;
         const verticesLeft = [
             { x: 0, y: 0 },
-            { x: padding, y: triangleHeight/2 },
-            { x: 0, y: triangleHeight }
+            { x: this.padding, y: this.triangleHeight/2 },
+            { x: 0, y: this.triangleHeight }
         ];
         const verticesRight = [
-            { x: 0, y: triangleHeight/2 },
-            { x: padding, y: 0 },
-            { x: padding, y: triangleHeight }
+            { x: 0, y: this.triangleHeight/2 },
+            { x: this.padding, y: 0 },
+            { x: this.padding, y: this.triangleHeight }
         ];
         
         // Calculate x value of centroids
@@ -94,15 +108,15 @@ const priceDrop = {
                 }
             );
             walls.push(triangleLeft, triangleRight);
-            y = y + triangleHeight;
+            y = y + this.triangleHeight;
         }
 
         // Add side walls to slots area
-        const slotWallWidth = padding;
-        const slotWallHeight = triangleHeight;
+        const slotWallWidth = this.padding;
+        const slotWallHeight = this.triangleHeight;
         const slotWallLeft = Matter.Bodies.rectangle(
-            padding/2+this.walls.thickness,
-            this.height-(triangleHeight/2)-this.walls.thickness,
+            this.padding/2+this.walls.thickness,
+            this.height-(this.triangleHeight/2)-this.walls.thickness,
             slotWallWidth,
             slotWallHeight, {
                 render: { fillStyle: this.walls.colour},
@@ -111,8 +125,8 @@ const priceDrop = {
 
         );
         const slotWallRight = Matter.Bodies.rectangle(
-            this.width-(padding/2+this.walls.thickness),
-            this.height-(triangleHeight/2)-this.walls.thickness,
+            this.width-(this.padding/2+this.walls.thickness),
+            this.height-(this.triangleHeight/2)-this.walls.thickness,
             slotWallWidth,
             slotWallHeight, {
                 render: { fillStyle: this.walls.colour},
@@ -125,19 +139,13 @@ const priceDrop = {
         return walls;
     },
     buildPegs: function() {
-        const triangleHeight = this.height*0.16;
-        const padding = this.width*this.padding;
-        const totalWidth = this.width-(padding*2)-(this.walls.thickness*2);
-        const slotWidth = (totalWidth-((this.slots-1)*this.walls.thickness))/this.slots;
-        const dividerGap = slotWidth + this.walls.thickness;
-
         const pegs = [];
         const rows = 10;
         const pegRadius = (((this.width-((this.width*0.09)*2))/this.slots)/30)
-        let pegGapX = slotWidth + this.walls.thickness;
-        let pegGapY = triangleHeight/2;
-        let x = this.walls.thickness + padding + slotWidth/2;
-        let y = (triangleHeight/2)+(this.height-triangleHeight*this.triangles)-this.walls.thickness-triangleHeight;
+        let pegGapX = this.slotWidth + this.walls.thickness;
+        let pegGapY = this.triangleHeight/2;
+        let x = this.walls.thickness + this.padding + this.slotWidth/2;
+        let y = (this.triangleHeight/2)+(this.height-this.triangleHeight*this.triangles)-this.walls.thickness-this.triangleHeight;
         
         for (let row=0; row < rows; row++){
             
@@ -155,19 +163,19 @@ const priceDrop = {
                 x = x + pegGapX;
             }
             y = y + pegGapY;
-            (row%2 === 0) ? x = (this.walls.thickness + padding + slotWidth/2) + pegGapX/2 : x = this.walls.thickness + padding + slotWidth/2;
+            (row%2 === 0) ? x = (this.walls.thickness + this.padding + this.slotWidth/2) + pegGapX/2 : x = this.walls.thickness + this.padding + this.slotWidth/2;
         }
         return pegs;
     },
     buildDisc: function(x) {
-        const radius = (((this.width-((this.width*0.09)*2))/this.slots)/4);
+        const radius = (this.slotWidth/2)-(this.slotWidth*0.05);
         const disc = Matter.Bodies.circle(
             x,
             0,
             radius,{
                 render: { fillStyle: 'orange' },
                 friction: 0.1,
-                restitution: 0.7,
+                restitution: 0.5,
                 label: 'disc'
             }
         );
@@ -175,13 +183,8 @@ const priceDrop = {
     },
     buildSlotDividers: function() {
         const dividers = [];
-        const padding = this.width*this.padding;
-        const totalWidth = this.width-(padding*2)-(this.walls.thickness*2);
-        const triangleHeight = this.height*0.16;
-        const height = triangleHeight/2;
-        const slotWidth = (totalWidth-((this.slots-1)*this.walls.thickness))/this.slots;
-        const dividerGap = slotWidth + this.walls.thickness;
-        let x = this.walls.thickness + padding + slotWidth + (this.walls.thickness/2);
+        const height = this.triangleHeight/2;
+        let x = this.walls.thickness + this.padding + this.slotWidth + (this.walls.thickness/2);
         let y = this.height-(height/2)-this.walls.thickness;
         for (let i=0; i < this.slots-1; i++) {
             const divider = Matter.Bodies.rectangle(
@@ -190,50 +193,41 @@ const priceDrop = {
                 this.walls.thickness,
                 height, {
                     render: { fillStyle: this.walls.colour },
-                    isStatic: true
+                    isStatic: true,
                 }
             )
-            x = x + dividerGap;
+            x = x + this.dividerGap;
             dividers.push(divider);
         }
         return dividers;
     },
     buildSensors: function() {
         const sensors = [];
-        const padding = this.width*this.padding;
-        const totalWidth = this.width-(padding*2)-(this.walls.thickness*2);
-        const triangleHeight = this.height*0.16;
-        const height = triangleHeight/3;
-        const slotWidth = (totalWidth-((this.slots-1)*this.walls.thickness))/this.slots;
-        const dividerGap = slotWidth + this.walls.thickness;
-        let x = this.walls.thickness + padding + slotWidth/2;
+        const height = this.triangleHeight/3;
+        let x = this.walls.thickness + this.padding + this.slotWidth/2;
         let y = this.height-(height/2)-this.walls.thickness;
         for (let i=0; i < this.slots; i++) {
             const sensor = Matter.Bodies.rectangle(
                 x,
                 y,
-                slotWidth,
+                this.slotWidth,
                 height, {
-                    render: {fillStyle: '#c007'},
+                    render: {fillStyle: '#ffffff07'},
                     isStatic: true,
                     isSensor: true,
                     label: `sensor-${i}`
                 }
             )
-            x = x + dividerGap;
+            x = x + this.dividerGap;
             sensors.push(sensor);
         }
         return sensors;
     }
 
 }
+    // Initialize game
+    priceDrop.create(500,700,7);
 
-
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildWalls());
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildPegs());
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSlotDividers());
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildSensors());
-    Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(99));
     
     // Sensor detection
     Matter.Events.on(priceDrop.engine, 'collisionStart', (event) => {
