@@ -29,6 +29,12 @@ const priceDrop = {
         Matter.Composite.add(this.engine.world, this.buildPegs());
         Matter.Composite.add(this.engine.world, this.buildSlotDividers());
         Matter.Composite.add(this.engine.world, this.buildSensors());
+        this.sensorDetectionOn();
+        this.discDropEventHandler();
+        const runner = Matter.Runner.create();
+        Matter.Runner.run(runner, priceDrop.engine);
+        Matter.Render.run(this.buildCanvas());
+
     },
     buildCanvas: function (){
         return Matter.Render.create({
@@ -222,41 +228,38 @@ const priceDrop = {
             sensors.push(sensor);
         }
         return sensors;
-    }
+    },
+    sensorDetectionOn: function() {
+        Matter.Events.on(priceDrop.engine, 'collisionStart', (event) => {
+            const pairs = event.pairs;
 
+            for (var i = 0; i < pairs.length; i++) {
+                var pair = pairs[i];
+
+                if (pair.bodyA.label.startsWith('sensor')) {
+                    console.log(`You got ${pair.bodyA.label}`);
+                }
+            }
+
+        })
+    },
+    discDropEventHandler: function() {
+        this.canvas.addEventListener('click', (e) => {
+            let x = Number(e.clientX);
+            const canvas = priceDrop.canvas.getBoundingClientRect();
+            x = x - canvas.left;
+            if ((x > priceDrop.walls.thickness) && x < (priceDrop.width - priceDrop.walls.thickness)) {
+                Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(x));
+            }
+        }); 
+    }
 }
-    // Initialize game
-    priceDrop.create(500,700,7);
+
+
+// Initialize game
+priceDrop.create(500,700,7);
+
 
     
-    // Sensor detection
-    Matter.Events.on(priceDrop.engine, 'collisionStart', (event) => {
-        const pairs = event.pairs;
-
-        for (var i = 0; i < pairs.length; i++) {
-            var pair = pairs[i];
-
-            if (pair.bodyA.label.startsWith('sensor')) {
-                console.log(`You got ${pair.bodyA.label}`);
-            }
-        }
-
-    })
-
-    // Event handler for disc drop
-    priceDrop.canvas.addEventListener('click', (e) => {
-        let x = Number(e.clientX);
-        const canvas = priceDrop.canvas.getBoundingClientRect();
-        x = x - canvas.left;
-        if ((x > priceDrop.walls.thickness) && x < (priceDrop.width - priceDrop.walls.thickness)) {
-            Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(x));
-        }
-    }); 
-
-
-
-    const runner = Matter.Runner.create();
-    Matter.Runner.run(runner, priceDrop.engine);
-    Matter.Render.run(priceDrop.buildCanvas());
 
 
