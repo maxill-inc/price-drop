@@ -81,7 +81,7 @@ const priceDrop = {
                 centerXPosLeft+this.walls.thickness,
                 y,
                 verticesLeft, {
-                render: { fillStyle: 'yellow'},
+                render: { fillStyle: this.walls.colour},
                 isStatic: true
                 }
             );
@@ -89,7 +89,7 @@ const priceDrop = {
                 this.width-centerXPosRight/2-this.walls.thickness,
                 y,
                 verticesRight, {
-                render: { fillStyle: 'green'},
+                render: { fillStyle: this.walls.colour},
                 isStatic: true
                 }
             );
@@ -105,7 +105,7 @@ const priceDrop = {
             this.height-(triangleHeight/2)-this.walls.thickness,
             slotWallWidth,
             slotWallHeight, {
-                render: { fillStyle: '#c007'},
+                render: { fillStyle: this.walls.colour},
                 isStatic: true
             }
 
@@ -115,7 +115,7 @@ const priceDrop = {
             this.height-(triangleHeight/2)-this.walls.thickness,
             slotWallWidth,
             slotWallHeight, {
-                render: { fillStyle: '#c007'},
+                render: { fillStyle: this.walls.colour},
                 isStatic: true
             }
 
@@ -170,10 +170,12 @@ const priceDrop = {
     },
     buildSlotDividers: function() {
         const dividers = [];
-        const totalWidth = (this.width-((this.width*0.09)*2));
+        const padding = this.width*this.padding;
+        const totalWidth = this.width-(padding*2)-(this.walls.thickness*2);
         const height = 40;
-        const dividerGap = totalWidth/this.slots+(this.walls.thickness/(this.slots-1));
-        let x = (this.width*0.09)+dividerGap-(this.walls.thickness/2);
+        const slotWidth = (totalWidth-((this.slots-1)*this.walls.thickness))/this.slots;
+        const dividerGap = slotWidth + this.walls.thickness;
+        let x = this.walls.thickness + padding + slotWidth + (this.walls.thickness/2);
         let y = this.height-(height/2)-this.walls.thickness;
         for (let i=0; i < this.slots-1; i++) {
             const divider = Matter.Bodies.rectangle(
@@ -181,7 +183,7 @@ const priceDrop = {
                 y,
                 this.walls.thickness,
                 height, {
-                    render: { fillStyle: 'red' },
+                    render: { fillStyle: this.walls.colour },
                     isStatic: true
                 }
             )
