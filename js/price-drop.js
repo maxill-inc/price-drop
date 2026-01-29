@@ -243,6 +243,7 @@ const priceDrop = {
                 if (pair.bodyA.label.startsWith('sensor')) {
                     const prizeIndex = pair.bodyA.label.slice(7);
                     console.log(`You got ${prizeList[prizeIndex].name}`);
+                    window.postMessage(`You got ${prizeList[prizeIndex].name}`);
                 }
             }
 
