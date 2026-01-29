@@ -242,7 +242,7 @@ const priceDrop = {
 
                 if (pair.bodyA.label.startsWith('sensor')) {
                     const prizeIndex = pair.bodyA.label.slice(7);
-                    window.parent.postMessage(`{prize: ${prizeList[prizeIndex].name}}`, 'https://www.maxill.com/');
+                    window.parent.postMessage(`{prize: ${prizeIndex}}`, 'https://www.maxill.com/');
                 }
             }
 
@@ -259,44 +259,6 @@ const priceDrop = {
         }); 
     }
 }
-
-const prizeList = [
-    {
-        name: 'Prize 1',
-        item: '#0001',
-        imgSrc: '',
-    },
-    {
-        name: 'Prize 2',
-        item: '#0002',
-        imgSrc: '',
-    },
-    {
-        name: 'Prize 3',
-        item: '#0003',
-        imgSrc: '',
-    },
-    {
-        name: 'Prize 4',
-        item: '#0004',
-        imgSrc: '',
-    },
-    {
-        name: 'Prize 5',
-        item: '#0005',
-        imgSrc: '',
-    },
-    {
-        name: 'Prize 6',
-        item: '#0006',
-        imgSrc: '',
-    },
-    {
-        name: 'Prize 7',
-        item: '#0007',
-        imgSrc: '',
-    },
-]
 
 
 // Initialize game
