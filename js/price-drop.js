@@ -242,7 +242,10 @@ const priceDrop = {
 
                 if (pair.bodyA.label.startsWith('sensor')) {
                     const prizeIndex = pair.bodyA.label.slice(7);
-                    window.parent.postMessage(`{prize: ${prizeIndex}}`, 'https://www.maxill.com/');
+                    const prizeData = {
+                        prize: Number(prizeIndex)
+                    };
+                    window.parent.postMessage(prizeData, 'https://www.maxill.com/');
                 }
             }
 
