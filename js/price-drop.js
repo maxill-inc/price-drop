@@ -176,7 +176,7 @@ const priceDrop = {
         const radius = (this.slotWidth/2)-(this.slotWidth*0.05);
         const disc = Matter.Bodies.circle(
             x,
-            0,
+            25,
             radius,{
                 //render: { fillStyle: '#e75757' },
                 render: {
@@ -200,7 +200,7 @@ const priceDrop = {
             const divider = Matter.Bodies.rectangle(
                 x,
                 y,
-                this.walls.thickness,
+                this.walls.thickness/2,
                 height, {
                     render: { fillStyle: this.walls.colour, opacity: 0.15 },
                     isStatic: true,
