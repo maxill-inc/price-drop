@@ -8,9 +8,9 @@ const priceDrop = {
     width: 500,
     height: 500,
     slots: 5,
-    walls: {thickness: 10, colour: '#1d5f23'},
+    walls: {thickness: 10, colour: '#0d4812'},
     triangles: 5,
-    background: '#dcefdb',
+    background: '#fcf8c8',
     engine: Matter.Engine.create(),
     canvas: document.getElementById('price-drop'),
     create: function(w, h, slots) {
