@@ -8,9 +8,9 @@ const priceDrop = {
     width: 500,
     height: 500,
     slots: 5,
-    walls: {thickness: 10, colour: '#c32132'},
+    walls: {thickness: 10, colour: '#1d5f23'},
     triangles: 5,
-    background: '#efe0db',
+    background: '#dcefdb',
     engine: Matter.Engine.create(),
     canvas: document.getElementById('price-drop'),
     create: function(w, h, slots) {
@@ -162,7 +162,7 @@ const priceDrop = {
                     x,
                     y,
                     pegRadius, {
-                    render: {fillStyle: '#e75757'},
+                    render: {fillStyle: '#21912c'},
                     isStatic: true,
                 }));
                 x = x + pegGapX;
@@ -178,10 +178,10 @@ const priceDrop = {
             x,
             25,
             radius,{
-                //render: { fillStyle: '#e75757' },
+                //render: { fillStyle: '#21912c' },
                 render: {
                     sprite: {
-                        texture: './heart-sprite.png'
+                        texture: './shamrock-sprite.png'
                     }
                 },
                 friction: 0.1,
