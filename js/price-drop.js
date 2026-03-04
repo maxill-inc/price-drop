@@ -246,6 +246,7 @@ const priceDrop = {
                         prize: Number(prizeIndex)
                     };
                     window.parent.postMessage(prizeData, 'https://www.maxill.com/');
+                    
                 }
             }
 
@@ -258,8 +259,12 @@ const priceDrop = {
             x = x - canvas.left;
             if ((x > priceDrop.walls.thickness) && x < (priceDrop.width - priceDrop.walls.thickness)) {
                 Matter.Composite.add(priceDrop.engine.world, priceDrop.buildDisc(x));
+                this.disableDiscDrop();
             }
         }); 
+    },
+    disableDiscDrop: function() {
+        this.canvas.style.pointerEvents = 'none';
     }
 }
 
