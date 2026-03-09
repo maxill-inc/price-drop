@@ -181,7 +181,7 @@ const priceDrop = {
                 //render: { fillStyle: '#21912c' },
                 render: {
                     sprite: {
-                        texture: './shamrock-sprite.png'
+                        texture: './shamrock-coin.png'
                     }
                 },
                 friction: 0.1,
